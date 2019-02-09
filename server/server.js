@@ -4,7 +4,7 @@ const http = require("http");
 const socketio = require("socket.io");
 
 const PORT = process.env.PORT || 3333
-
+var sockets
 
 const app = express();
 
@@ -20,6 +20,13 @@ io.on("connection", (socket) => {
 
   socket.on("disconnect", (socket) => {
     console.log("User disconnected!");
+  })
+
+  socket.on("sendMessage", (message) => {
+    console.log(`Received message from ${message.sender}`);
+    // Both work
+    // io.sockets.emit("broadcastMessage", message);
+    io.emit("broadcastMessage", message);
   })
 });
 

@@ -5,11 +5,19 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <link rel="stylesheet" href="css/index.css">
   <title>Node Chat App</title>
 </head>
 
 <body>
-  <h1>CHAT</h1>
+  <h1>Client</h1>
+
+  <label for="#sender">From: </label><input type="text" id="sender">
+  <label for="#message">Message: </label><input type="text" id="message">
+  <button id="send">Send</button>
+  <div id="chatbox">
+
+  </div>
 
   <script src="/socket.io/socket.io.js"></script>
   <script src="/js/index.js"></script>
