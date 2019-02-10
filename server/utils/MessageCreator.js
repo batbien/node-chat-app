@@ -10,7 +10,7 @@ const createMessage = (sender, message) => {
 const createLocationMessage = (sender, latitude, longitude) => {
   return {
     sender: sender,
-    message: `https://map.google.com?q=${latitude},${longitude}`,
+    message: `https://maps.google.com/maps?z=12&t=k&q=loc:${latitude}+${longitude}`,
     sentAt: new Date().getTime()
   };
 };

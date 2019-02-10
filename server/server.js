@@ -36,10 +36,10 @@ io.on("connection", (socket) => {
     console.log("User disconnected!");
   });
 
-  socket.on("sendMessage", (message) => {
+  socket.on("sendMessage", (message, cb) => {
     console.log(`Received message from ${message.sender}`);
     io.emit("newMessage", message);
-    // socket.broadcast.emit("broadcastMessage", message);
+    cb();
   });
 
   socket.on("sendLocation", (location) => {

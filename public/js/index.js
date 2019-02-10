@@ -6,8 +6,36 @@ $(function() {
   var chatbox = $("#chatbox");
   var send = $("#send");
   var sendLocation = $("#send-location");
+  var chatForm = $("#chat-form");
 
-  send.click(function(event) {
+  var ctrlDown = false;
+
+  message.on("keydown", function(event) {
+    if (!ctrlDown && event.key === "Control")
+      ctrlDown = true;
+    else if (event.key === "Enter") {
+      if (ctrlDown)
+        message.val(message.val() + "\n");
+      else
+        sendMessage(event);
+    }
+  });
+
+  message.on("keyup", function(event) {
+    if (ctrlDown && event.key === "Control")
+      ctrlDown = false;
+
+  });
+
+  $(window).blur(function() {
+    // In case the user switch tab/window while pressing ctrl
+    ctrlDown = false;
+  });
+
+  chatForm.on("submit", sendMessage);
+  send.click(sendMessage);
+
+  function sendMessage(event) {
     event.preventDefault();
     if (connecting) {
       if (!(sender.val() && message.val()))
@@ -15,24 +43,31 @@ $(function() {
       socket.emit("sendMessage", {
         sender: sender.val(),
         message: message.val(),
+      }, function() {
+        message.val("");
+        message.focus();
       });
     } else {
       let notConnected = document.createElement("li");
       $(notConnected).addClass("not-connected");
       $(notConnected).text("Not connected.");
-      chatbox.prepend(notConnected);
+      chatbox.append(notConnected);
     }
-  });
+  };
 
   sendLocation.click(function(event) {
     event.preventDefault();
     if (!sender.val())
       return;
+    sendLocation.attr("disabled", "disabled");
+    sendLocation.text("processing...");
     if (!("geolocation" in navigator))
       alert("Geolocation not supported!");
     else {
       navigator.geolocation.getCurrentPosition(
         function(location) {
+          sendLocation.removeAttr("disabled");
+          sendLocation.text("Send my location");
           socket.emit("sendLocation", {
             sender: sender.val(),
             latitude: location.coords.latitude,
@@ -40,6 +75,8 @@ $(function() {
           });
         },
         function(err) {
+          sendLocation.removeAttr("disabled");
+          sendLocation.text("Send my location");
           alert("Cannot fetch position!");
           console.log(err);
         }
@@ -60,7 +97,7 @@ $(function() {
   socket.on("newMessage", function(message) {
     let msg = document.createElement("li");
     $(msg).html(`<b>${message.sender}:</b> ${message.message}`);
-    chatbox.prepend(msg);
+    chatbox.append(msg);
   });
 
   socket.on("newLocation", function(message) {
@@ -72,7 +109,7 @@ $(function() {
     $(msgBody).text("Click to see my location").attr({ "target": "_blank", "href": message.message });
 
     $(msg).append(msgSender).append(msgBody);
-    chatbox.prepend(msg);
+    chatbox.append(msg);
   });
 
 });

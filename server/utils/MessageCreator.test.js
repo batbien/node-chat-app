@@ -25,7 +25,7 @@ describe("Test utils/MessageCreator createLocationMessage()", () => {
     var msg = createLocationMessage(sender, latitude, longitude);
     var after = new Date().getTime();
     expect(msg.sender).toEqual(sender);
-    expect(msg.message).toEqual(`https://map.google.com?q=${latitude},${longitude}`);
+    expect(msg.message).toEqual(`https://maps.google.com/maps?z=12&t=k&q=loc:${latitude}+${longitude}`);
     expect(typeof msg.sentAt).toBe("number");
     expect(msg.sentAt).toBeGreaterThanOrEqual(before);
     expect(msg.sentAt).toBeLessThanOrEqual(after);
