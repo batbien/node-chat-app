@@ -11,15 +11,20 @@
 
 <body>
   <h1>Client</h1>
+  <form>
+    <label for="#sender">From: </label>
+    <input type="text" id="sender" placeholder="nickname">
+    <label for="#message">Message: </label>
+    <input type="text" id="message" placeholder="please enter a message">
+    <button id="send">Send</button>
+    <button id="send-location">Send my location</button>
+  </form>
+  <ul id="chatbox">
 
-  <label for="#sender">From: </label><input type="text" id="sender">
-  <label for="#message">Message: </label><input type="text" id="message">
-  <button id="send">Send</button>
-  <div id="chatbox">
-
-  </div>
+  </ul>
 
   <script src="/socket.io/socket.io.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
   <script src="/js/index.js"></script>
 </body>
 
