@@ -5,12 +5,14 @@ const https = require("https");
 const socketio = require("socket.io");
 
 const { createMessage, createLocationMessage } = require("./utils/MessageCreator");
+const { validateStr } = require("./utils/Validation");
+const { Users } = require("./utils/Users");
 
 const PORT = process.env.PORT || 3333
 var sockets
 
 const app = express();
-
+const users = new Users();
 
 app.use(express.static(path.join(__dirname, "..", "public")));
 
@@ -22,31 +24,62 @@ const server = https.createServer({
 const io = socketio(server);
 
 io.on("connection", (socket) => {
-  console.log("User connected!");
+  console.log("[+] User connected!");
 
   // Say hello to new user
   socket.emit("newMessage",
-    createMessage("admin", "Hi! Welcome to NOdE cHAt aPp!"));
+    createMessage("Admin", "Hi! Welcome to NOdE cHAt aPp!"));
 
-  // announce new user has joined
-  socket.broadcast.emit("newMessage",
-    createMessage("admin", "New user has just joined."));
+  socket.on("join", (userInfo, cb) => {
+    if (!validateStr(userInfo.username) || !validateStr(userInfo.room)) {
+      console.log("[-] Invalid user information");
+      cb("Invalid user information");
+    } else {
+      // Add user to list
+      users.removeUser(socket.id);
+      let user = users.addUser(socket.id, userInfo.username, userInfo.room);
+      socket.join(user.room);
 
-  socket.on("disconnect", (socket) => {
-    console.log("User disconnected!");
+      // Announce new user has joined
+      io.to(user.room).emit("newMessage",
+        createMessage("Admin", `${user.username} has joined.`));
+
+      // Broadcast the new user list to the room
+      io.to(user.room).emit("newUserList", users.getUserList(user.room));
+
+      // Send acknowledgement
+      cb();
+    }
   });
 
   socket.on("sendMessage", (message, cb) => {
-    console.log(`Received message from ${message.sender}`);
-    io.emit("newMessage", message);
+    let user = users.getUser(socket.id);
+    io.to(user.room).emit("newMessage", message);
     cb();
   });
 
   socket.on("sendLocation", (location) => {
-    console.log(`Received location from ${location.sender}`);
-    io.emit("newLocation", createLocationMessage(
+    let user = users.getUser(socket.id);
+    io.to(user.room).emit("newLocation", createLocationMessage(
       location.sender, location.latitude, location.longitude));
-  })
+  });
+
+  socket.on("disconnect", () => {
+    // Remove user from list
+    let user = users.removeUser(socket.id);
+    console.log(user);
+    if (user) {
+      // announce user has left
+      io.to(user.room).emit("newMessage",
+        createMessage("Admin", `${user.username} has left.`));
+
+      // Broadcast the new user list to the room
+      io.to(user.room).emit("newUserList", users.getUserList(user.room));
+
+      console.log(`[-] User ${user.username} disconnected.`);
+    } else
+      console.log(`[-] User disconnected.`);
+  });
 });
 
 

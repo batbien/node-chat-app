@@ -1,14 +1,20 @@
 $(function() {
   var socket = io.connect("https://192.168.0.103:3333");
   var connecting = false;
-  var sender = $('#sender');
   var message = $("#message");
   var chatbox = $("#chatbox");
+  var chatboxContainer = $("#chatbox-container");
   var send = $("#send");
   var sendLocation = $("#send-location");
   var chatForm = $("#chat-form");
+  var userList = $("#user-list");
+  var loading = $("#loading");
+  var chatlineMsgTemplate = $("#chatline-msg-template");
+  var chatlineLocationTemplate = $("#chatline-location-template");
+  var userlistItemTemplate = $("#userlist-li-template");
 
   var ctrlDown = false;
+  var sender;
 
   message.on("keydown", function(event) {
     if (!ctrlDown && event.key === "Control")
@@ -27,6 +33,16 @@ $(function() {
 
   });
 
+  function autoScroll() {
+    var clientHeight = chatboxContainer.prop("clientHeight");
+    var scrollTop = chatboxContainer.prop("scrollTop");
+    var scrollHeight = chatboxContainer.prop("scrollHeight");
+    var lastHeight = chatbox.children().last().innerHeight();
+    var secondLastHeight = $("#chatbox li:nth-last-child(2)").innerHeight();
+    if (scrollTop + clientHeight + secondLastHeight + lastHeight >= scrollHeight)
+      chatboxContainer.prop("scrollTop", scrollHeight);
+  }
+
   $(window).blur(function() {
     // In case the user switch tab/window while pressing ctrl
     ctrlDown = false;
@@ -38,10 +54,10 @@ $(function() {
   function sendMessage(event) {
     event.preventDefault();
     if (connecting) {
-      if (!(sender.val() && message.val()))
+      if (!message.val())
         return;
       socket.emit("sendMessage", {
-        sender: sender.val(),
+        sender,
         message: message.val(),
       }, function() {
         message.val("");
@@ -57,8 +73,6 @@ $(function() {
 
   sendLocation.click(function(event) {
     event.preventDefault();
-    if (!sender.val())
-      return;
     sendLocation.attr("disabled", "disabled");
     sendLocation.text("processing...");
     if (!("geolocation" in navigator))
@@ -69,7 +83,7 @@ $(function() {
           sendLocation.removeAttr("disabled");
           sendLocation.text("Send my location");
           socket.emit("sendLocation", {
-            sender: sender.val(),
+            sender,
             latitude: location.coords.latitude,
             longitude: location.coords.longitude,
           });
@@ -86,7 +100,17 @@ $(function() {
 
   socket.on("connect", function() {
     console.log("Connected to server!");
-    connecting = true;
+    sender = $.deparam(window.Location.search).username;
+    socket.emit("join", $.deparam(window.Location.search), (err) => {
+      if (err)
+        window.location = "/";
+      else {
+        console.log("ok");
+        loading.hide();
+        message.focus();
+        connecting = true;
+      }
+    })
   });
 
   socket.on("disconnect", function() {
@@ -95,21 +119,27 @@ $(function() {
   });
 
   socket.on("newMessage", function(message) {
-    let msg = document.createElement("li");
-    $(msg).html(`<b>${message.sender}:</b> ${message.message}`);
-    chatbox.append(msg);
+    let sentAt = moment(message.sentAt).format("h:mm a");
+    chatbox.html(chatbox.html() + Mustache.render(
+      chatlineMsgTemplate.html(), { sentAt, sender: message.sender, message: message.message }));
+    autoScroll();
   });
 
   socket.on("newLocation", function(message) {
-    let msg = document.createElement("li");
-    let msgSender = document.createElement("b");
-    let msgBody = document.createElement("a");
+    let sentAt = moment(message.sentAt).format("h:mm a");
+    chatbox.html(chatbox.html() + Mustache.render(
+      chatlineLocationTemplate.html(), { sentAt, sender: message.sender, href: message.message }));
+    autoScroll();
+  });
 
-    $(msgSender).text(`${message.sender}: `);
-    $(msgBody).text("Click to see my location").attr({ "target": "_blank", "href": message.message });
+  socket.on("newUserList", function(list) {
 
-    $(msg).append(msgSender).append(msgBody);
-    chatbox.append(msg);
+      let html = "";
+      list.forEach(function(name) {
+          html += Mustache.render(userlistItemTemplate.html(), { username: name });
+          console.log(html);
+      });
+      userList.html(html);
   });
 
 });

@@ -1,0 +1,78 @@
+html, body {
+  width: 100%;
+  height: 100%;
+  min-height: 100%;
+  padding: 0;
+  margin:0;
+}
+
+.sidebar {
+  background-color: #0d2527;
+  color: #336266;
+  padding-top: 15px;
+}
+
+.sidebar h1 {
+  text-align: center;
+}
+
+.sidebar #user-list {
+  list-style: none;
+  font-size: 1.5em;
+  padding-left: 0;
+}
+
+.chatbox-container {
+  height: 90%;
+  background-color: #090c0b;
+  overflow-y: scroll;
+  color: #b5b5b5;
+  padding: 5px;
+}
+
+.chatbox-container ul {
+  list-style: none;
+  padding: 0;
+}
+
+.chatform-container {
+  height: 10%;
+  background-color: #090c0b;
+  border-top: solid 1px #267368;
+}
+
+.chat-textarea {
+  background-color: #090c0b;
+  color: #267368;
+  border: 0;
+  padding: 3px;
+}
+
+.chat-textarea:focus {
+  outline: none;
+  color: #00b1a0;
+}
+
+.not-connected {
+  color: red;
+  font-weight: bold;
+}
+
+#loading {
+  /* display: none; */
+  position: fixed;
+  top: 0;
+  left: 0;
+  height:100%;
+  width:100%;
+  padding-top: 200px;
+  background-color: rgba(0,0,0,0.8);
+  text-align: center;
+  color: white;
+  content: "Connecting to server...";  z-index: 500;
+}
+
+#loading::before {
+  font-size: 2em;
+  content: "Connecting to server...";
+}

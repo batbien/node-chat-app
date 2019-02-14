@@ -1,4 +1,4 @@
-<!DOCTYPE HTML>
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -7,49 +7,24 @@
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
   <link rel="stylesheet" href="css/index.css">
-  <title>Node Chat App</title>
+  <title>NOdE cHAt aPp</title>
 </head>
 
 <body>
 
-  <div class="container-fluid h-100 p-0 m-0">
-    <div class="row h-100 p-0 m-0">
 
-      <div class="col-3 sidebar h-100 m-0">
-        <input type="text" id="sender" placeholder="nickname">
-      </div>
 
-      <div class="col-9 p-0 m-0">
-
-        <div class="container-fluid chatbox-container">
-          <ul id="chatbox"></ul>
-        </div>
-
-        <div class="container-fluid chatform-container p-0 m-0">
-          <form id="chat-form" class="h-100">
-            <div class="row h-100 m-0">
-              <div class="col-8 h-100 p-0 m-0">
-                <textarea class="w-100  m-0 chat-textarea" id="message" placeholder="enter a message"></textarea>
-              </div>
-              <div class="col-4 h-100 p-0 m-0">
-                <button class="btn btn-dark m-0" id="send">Send</button>
-                <button class="btn btn-dark m-0" id="send-location">Send my location</button>
-              </div>
-            </div>
-          </form>
-        </div>
-
-      </div>
-    </div>
+  <div class="form-container" method="get">
+    <form action="chat.html">
+      <div class="text-center"><h3>NOdE cHAt aPp</h3></div>
+      <div class="form-row"><label>Username: </label><input type="text" name="username" autofocus></div>
+      <div class="form-row"><label>Room: </label><input type="text" name="room"> </div>
+      <input type="submit" display="none">
+    </form>
   </div>
-
-
-
-  <script src="/socket.io/socket.io.js"></script>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
-  <script src="/js/index.js"></script>
 </body>
 
 </html>
